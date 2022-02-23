@@ -1,11 +1,15 @@
-package ams.attendence.management.system.repository;
+package ams.repository;
+
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import ams.attendence.management.system.entity.Student;
+import ams.entity.Student;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
 	
+	List<Student> findAllByIdIn(Set<Long> studentIds);
 }
