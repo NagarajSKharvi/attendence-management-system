@@ -93,6 +93,7 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 			student.setLastName("Last Name " + i);
 			student.setDob(LocalDate.now().plusDays(i));
 			student.setMobileNumber(Long.valueOf("720492984" + i));
+			student.setProfile(null);
 			students.add(student);
 		}
 		studentRepository.saveAll(students);
