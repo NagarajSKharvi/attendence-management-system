@@ -184,6 +184,11 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 			teacher.setFirstName("T First Name " + i);
 			teacher.setMiddleName("T Middle Name " + i);
 			teacher.setLastName("T Last Name " + i);
+			if (i % 2 == 0) {
+				teacher.setGender("Male");
+			} else {
+				teacher.setGender("Female");
+			}
 			teacher.setDob(LocalDate.now().plusDays(i));
 			teacher.setMobileNumber(Long.valueOf("720492984" + i));
 			teachers.add(teacher);

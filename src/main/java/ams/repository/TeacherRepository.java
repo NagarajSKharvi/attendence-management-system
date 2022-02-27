@@ -11,5 +11,5 @@ import ams.entity.Teacher;
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 	
-	List<Teacher> findAllByTeachIdIn(Set<Long> teachIds);
+	List<Teacher> findAllByIdIn(Set<Long> teachIds);
 }

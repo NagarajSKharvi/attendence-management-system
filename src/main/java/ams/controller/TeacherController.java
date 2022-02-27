@@ -18,7 +18,7 @@ import ams.repository.TeacherRepository;
 
 @RestController
 @RequestMapping("/teachers")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:19006")
 public class TeacherController {
 	
 	@Autowired

@@ -158,7 +158,7 @@ public class AttendanceController {
 		List<SectionSubject> sectionSubjects = sectionSubjectRepository.findAllBySubjectIdIn(subjectIds);
 		
 		Set<Long> teacherIds = attendances.stream().map(Attendance::getTeachId).collect(Collectors.toSet());
-		List<Teacher> teachers = teacherRepository.findAllByTeachIdIn(teacherIds);
+		List<Teacher> teachers = teacherRepository.findAllByIdIn(teacherIds);
 		
 		List<AttendanceResponse> list = new ArrayList<>();
 		attendances.stream().forEach(a -> {
@@ -178,7 +178,7 @@ public class AttendanceController {
 		SectionSubject sectionSubject = sectionSubjects.stream().filter(ss -> ss.getSubjectId().equals(attendance.getSubjectId())).findAny().orElse(null);
 		attendanceResponse.setSectionSubject(sectionSubject);
 		
-		Teacher teacher = teachers.stream().filter(ss -> ss.getTeachId().equals(attendance.getTeachId())).findAny().orElse(null);
+		Teacher teacher = teachers.stream().filter(ss -> ss.getId().equals(attendance.getTeachId())).findAny().orElse(null);
 		attendanceResponse.setTeacher(teacher);
 		
 //		try {
