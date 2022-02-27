@@ -30,8 +30,12 @@ public class StudClass {
 	@Column(name = "class_name")
 	private String className;
 	
-	public StudClass(String className) {
+	@Column(name = "class_year")
+	private Integer classYear;
+	
+	public StudClass(String className, Integer classYear) {
 		super();
 		this.className = className;
+		this.classYear = classYear;
 	}
 }

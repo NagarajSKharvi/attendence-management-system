@@ -1,4 +1,4 @@
-package ams.response;
+package ams.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,15 +11,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class StudentAttendanceResponse {
+public class StudentAttendanceRequest {
 	
 	private Long studentId;
-	private String rollNumber;
 	private boolean present;
 	
-	public StudentAttendanceResponse(Long studentId, String rollNumber) {
+	public StudentAttendanceRequest(Long studentId) {
 		super();
 		this.studentId = studentId;
-		this.rollNumber = rollNumber;
 	}
 }

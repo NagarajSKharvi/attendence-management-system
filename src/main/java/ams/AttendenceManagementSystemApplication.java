@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -47,16 +46,16 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 	public static void main(String[] args) {
 		SpringApplication.run(AttendenceManagementSystemApplication.class, args);
 	}
-	
+
 	@Override
 	public void run(String... args) throws Exception {
-		List<StudClass> studClasses = List.of(new StudClass("Class 1"),
-				new StudClass("Class 2"),
-				new StudClass("Class 3"),
-				new StudClass("Class 4"),
-				new StudClass("Class 5"),
-				new StudClass("Class 6"),
-				new StudClass("Class 7"));
+		List<StudClass> studClasses = List.of(new StudClass("Class 1", 2022),
+				new StudClass("Class 2", 2022),
+				new StudClass("Class 3", 2022),
+				new StudClass("Class 4", 2022),
+				new StudClass("Class 5", 2022),
+				new StudClass("Class 6", 2022),
+				new StudClass("Class 7", 2022));
 		studClassRepository.saveAll(studClasses);
 		
 		List<ClassSection> classSections = List.of(new ClassSection("Section A", 1l),
@@ -80,8 +79,83 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 				new ClassPeriod(LocalTime.of(3, 00), LocalTime.of(4, 50)));
 		classPeriodRepository.saveAll(classPeriods);
 		
-		List<Attendance> attendances = List.of(new Attendance(1l, 1l, 1l, LocalDate.of(2022, 02, 23), Set.of(1l, 2l, 3l))
-				);
+		String jsonString1 = "["
+				+ "    {"
+				+ "        \"studentId\": 1,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 2,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 3,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 4,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 5,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 6,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 7,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 8,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 9"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 10"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 11"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 12"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 13"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 14"
+				+ "    }"
+				+ "]";
+		
+		String jsonString2 = "["
+				+ "    {"
+				+ "        \"studentId\": 1,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 5,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 6,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 7,"
+				+ "        \"present\": true"
+				+ "    },"
+				+ "    {"
+				+ "        \"studentId\": 14"
+				+ "    }"
+				+ "]";
+
+		List<Attendance> attendances = List.of(new Attendance(1l, 1l, 1l, LocalDate.of(2022, 02, 23), jsonString1),
+				new Attendance(2l, 3l, 1l, LocalDate.of(2022, 02, 23), jsonString2));
 		attendanceRepository.saveAll(attendances);
 		
 		List<Student> students = new ArrayList<>();
@@ -91,6 +165,11 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 			student.setFirstName("First Name " + i);
 			student.setMiddleName("Middle Name " + i);
 			student.setLastName("Last Name " + i);
+			if (i % 2 == 0) {
+				student.setGender("Male");
+			} else {
+				student.setGender("Female");
+			}
 			student.setDob(LocalDate.now().plusDays(i));
 			student.setMobileNumber(Long.valueOf("720492984" + i));
 			student.setProfile(null);

@@ -42,6 +42,9 @@ public class Student {
 	@Column(name = "last_name")
 	private String lastName;
 	
+	@Column(name = "gender")
+	private String gender;
+	
 	@Column(name = "dob")
 	private LocalDate dob;
 	

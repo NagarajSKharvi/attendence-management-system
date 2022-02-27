@@ -1,5 +1,6 @@
 package ams.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,12 @@ public class AMSController {
 	
 	@GetMapping("/class")
 	public List<StudClass> listClass() {
-		return studClassRepository.findAll();
+		return studClassRepository.findByClassYear(LocalDate.now().getYear());
 	}
 	
-	@GetMapping("/section")
-	public List<ClassSection> listSection() {
-		return classSectionRepository.findAll();
+	@GetMapping("/section/{classId}")
+	public List<ClassSection> listSection(@PathVariable Long classId) {
+		return classSectionRepository.findByClassId(classId);
 	}
 	
 	@GetMapping("/subject/{sectionId}")
