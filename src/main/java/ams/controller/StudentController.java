@@ -40,6 +40,8 @@ public class StudentController {
 	@GetMapping("")
 	public List<Student> list() {
 		List<Student> students = studentRepository.findAll();
+		students.stream().forEach(s -> {
+		});
 		return students;
 	}
 	

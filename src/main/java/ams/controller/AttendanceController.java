@@ -2,7 +2,9 @@ package ams.controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,18 +25,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ams.entity.Attendance;
 import ams.entity.ClassPeriod;
+import ams.entity.SectionStudent;
+import ams.entity.SectionStudentId;
 import ams.entity.SectionSubject;
 import ams.entity.Student;
 import ams.entity.Teacher;
 import ams.repository.AttendanceRepository;
 import ams.repository.ClassPeriodRepository;
 import ams.repository.ClassSectionRepository;
+import ams.repository.SectionStudentRepository;
 import ams.repository.SectionSubjectRepository;
 import ams.repository.StudClassRepository;
 import ams.repository.StudentRepository;
 import ams.repository.TeacherRepository;
 import ams.request.AttendenceRequest;
-import ams.request.StudentAttendanceRequest;
 import ams.response.AttendanceResponse;
 import ams.response.StudentAttendanceResponse;
 
@@ -52,11 +56,37 @@ public class AttendanceController {
 	@Autowired
 	private SectionSubjectRepository sectionSubjectRepository;
 	@Autowired
+	private SectionStudentRepository sectionStudentRepository;
+	@Autowired
 	private ClassPeriodRepository classPeriodRepository;
 	@Autowired
 	private AttendanceRepository attendanceRepository;
 	@Autowired
 	private TeacherRepository teacherRepository;
+	
+	@GetMapping("/stud/{studentId}")
+	public Map<String, String> getStudAttendance(@PathVariable Long studentId) {
+		SectionStudent sectionStudent = sectionStudentRepository.findAllBySectionStudentIdStudId(studentId);
+		List<SectionSubject> sectionSubjects = sectionSubjectRepository.findAllBySectionId(sectionStudent.getSectionStudentId().getSectionId());
+		Set<Long> subjectIds = sectionSubjects.stream().map(SectionSubject::getSubjectId).collect(Collectors.toSet());
+		List<Attendance> attendances = attendanceRepository.findBySubjectIdIn(subjectIds);
+		Map<String, String> maps = new HashMap<>();
+		attendances.stream().forEach(a -> {
+			List<StudentAttendanceResponse> resp = null;
+			try {
+				resp = new ObjectMapper().readValue(a.getJson(), new TypeReference<List<StudentAttendanceResponse>>(){});
+			} catch (JsonMappingException e) {
+			} catch (JsonProcessingException e) {
+			}
+			String isPresent = "No";
+			StudentAttendanceResponse studentAttendanceResponse = resp.stream().filter(r -> r.getStudentId().equals(studentId)).findAny().orElse(null);
+			if (!ObjectUtils.isEmpty(studentAttendanceResponse) && studentAttendanceResponse.isPresent()) {
+				isPresent = "Yes";
+			}
+			maps.put(a.getDate() + " " + a.getPeriodId(), isPresent);
+		});
+		return maps;
+	}
 	
 	@GetMapping("/{attendanceId}")
 	public AttendanceResponse getAttendance(@PathVariable Long attendanceId) {
@@ -92,18 +122,10 @@ public class AttendanceController {
 		return attendanceResponse;
 	}
 	
-	@GetMapping("")
-	public List<AttendanceResponse> listAttendance() {
-		List<Attendance> attendances = attendanceRepository.findAll();
-		List<AttendanceResponse> list = getAttendanceResponses(attendances);
-		return list;
-	}
-	
 	@PostMapping("")
 	public List<AttendanceResponse> listAttendance(@RequestBody AttendenceRequest attendenceRequest) {
 		List<Attendance> attendances = getAttendence(attendenceRequest);
-		List<AttendanceResponse> list = getAttendanceResponses(attendances);
-		return list;
+		return getAttendanceResponses(attendances);
 	}
 	
 	@PostMapping("/create")
@@ -121,12 +143,15 @@ public class AttendanceController {
 		return true;
 	}
 
-	@GetMapping("/get")
-	public AttendanceResponse getAttendance() {
+	@GetMapping("/get/{sectionId}")
+	public AttendanceResponse getAttendanceBySection(@PathVariable Long sectionId) {
 		AttendanceResponse attendanceResponse = new AttendanceResponse();
 		attendanceResponse.setDate(LocalDate.now());
 		List<StudentAttendanceResponse> studentAttendanceResponses = new ArrayList<>();
-		List<Student> students = studentRepository.findAll();
+		List<SectionStudent> sectionStudents = sectionStudentRepository.findAllBySectionStudentIdSectionId(sectionId);
+		Set<Long> studentIds = sectionStudents.stream().map(SectionStudent::getSectionStudentId).map(SectionStudentId::getStudId)
+				.collect(Collectors.toSet());
+		List<Student> students = studentRepository.findAllByIdIn(studentIds);
 		students.stream().forEach(s -> {
 			studentAttendanceResponses.add(new StudentAttendanceResponse(s.getId(), s.getRollNumber()));
 		});
@@ -135,18 +160,44 @@ public class AttendanceController {
 	}
 	
 	private List<Attendance> getAttendence(AttendenceRequest attendenceRequest) {
+		Long periodId = attendenceRequest.getPeriodId();
+		Long subjectId = attendenceRequest.getSubjectId();
+		Long teachId = attendenceRequest.getTeachId();
+		LocalDate date = attendenceRequest.getDate();
 		List<Attendance> attendances = new ArrayList<>();
-		if (!ObjectUtils.isEmpty(attendenceRequest.getDate()) && !ObjectUtils.isEmpty(attendenceRequest.getSubjectId())) {
-			attendances = attendanceRepository.findByDateAndSubjectId(attendenceRequest.getDate(), attendenceRequest.getSubjectId());
-		} else if (!ObjectUtils.isEmpty(attendenceRequest.getDate())) {
-			attendances = attendanceRepository.findByDate(attendenceRequest.getDate());
-		} else if (!ObjectUtils.isEmpty(attendenceRequest.getSubjectId())) {
-			attendances = attendanceRepository.findBySubjectId(attendenceRequest.getSubjectId());
-		} else if (!ObjectUtils.isEmpty(attendenceRequest.getTeachId())) {
-			attendances = attendanceRepository.findByTeachId(attendenceRequest.getTeachId());
-		} else if (!ObjectUtils.isEmpty(attendenceRequest.getPeriodId())) {
-			attendances = attendanceRepository.findByPeriodId(attendenceRequest.getPeriodId());
-		}
+		if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(subjectId) &&
+				!ObjectUtils.isEmpty(teachId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findByPeriodIdAndSubjectIdAndTeachIdAndDate(periodId, subjectId, teachId, date);
+		} else if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(subjectId) && !ObjectUtils.isEmpty(teachId)) {
+			attendances = attendanceRepository.findByPeriodIdAndSubjectIdAndTeachId(periodId, subjectId, teachId);
+		} else if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(subjectId) &&
+				!ObjectUtils.isEmpty(teachId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findByPeriodIdAndSubjectIdAndDate(periodId, subjectId, date);
+		} else if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(teachId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findByPeriodIdAndTeachIdAndDate(periodId, teachId, date);
+		} else if (!ObjectUtils.isEmpty(subjectId) && !ObjectUtils.isEmpty(teachId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findBySubjectIdAndTeachIdAndDate(subjectId, teachId, date);
+		} else if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(subjectId)) {
+			attendances = attendanceRepository.findByPeriodIdAndSubjectId(periodId, subjectId);
+		} else if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(teachId)) {
+			attendances = attendanceRepository.findByPeriodIdAndTeachId(periodId, teachId);
+		} else if (!ObjectUtils.isEmpty(periodId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findByPeriodIdAndDate(periodId, date);
+		} else if (!ObjectUtils.isEmpty(subjectId) && !ObjectUtils.isEmpty(teachId)) {
+			attendances = attendanceRepository.findBySubjectIdAndTeachId(subjectId, teachId);
+		} else if (!ObjectUtils.isEmpty(subjectId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findBySubjectIdAndDate(subjectId, date);
+		} else if (!ObjectUtils.isEmpty(teachId) && !ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findByTeachIdAndDate(teachId, date);
+		} else if (!ObjectUtils.isEmpty(periodId)) {
+			attendances = attendanceRepository.findByPeriodId(periodId);
+		} else if (!ObjectUtils.isEmpty(subjectId)) {
+			attendances = attendanceRepository.findBySubjectId(subjectId);
+		} else if (!ObjectUtils.isEmpty(teachId)) {
+			attendances = attendanceRepository.findByTeachId(teachId);
+		} else if (!ObjectUtils.isEmpty(date)) {
+			attendances = attendanceRepository.findByDate(date);
+		} 
 		return attendances;
 	}
 

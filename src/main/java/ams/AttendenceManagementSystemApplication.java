@@ -13,17 +13,24 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ams.entity.Attendance;
 import ams.entity.ClassPeriod;
 import ams.entity.ClassSection;
+import ams.entity.SectionStudent;
+import ams.entity.SectionStudentId;
 import ams.entity.SectionSubject;
 import ams.entity.StudClass;
 import ams.entity.Student;
 import ams.entity.Teacher;
+import ams.entity.TeacherSubject;
+import ams.entity.User;
 import ams.repository.AttendanceRepository;
 import ams.repository.ClassPeriodRepository;
 import ams.repository.ClassSectionRepository;
+import ams.repository.SectionStudentRepository;
 import ams.repository.SectionSubjectRepository;
 import ams.repository.StudClassRepository;
 import ams.repository.StudentRepository;
 import ams.repository.TeacherRepository;
+import ams.repository.TeacherSubjectRepository;
+import ams.repository.UserRepository;
 
 @SpringBootApplication
 public class AttendenceManagementSystemApplication implements CommandLineRunner {
@@ -39,9 +46,15 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 	@Autowired
 	private SectionSubjectRepository sectionSubjectRepository;
 	@Autowired
+	private SectionStudentRepository sectionStudentRepository;
+	@Autowired
+	private TeacherSubjectRepository teacherSubjectRepository;
+	@Autowired
 	private ClassPeriodRepository classPeriodRepository;
 	@Autowired
 	private AttendanceRepository attendanceRepository;
+	@Autowired
+	private UserRepository userRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(AttendenceManagementSystemApplication.class, args);
@@ -60,8 +73,8 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 		
 		List<ClassSection> classSections = List.of(new ClassSection("Section A", 1l),
 				new ClassSection("Section B", 1l),
-				new ClassSection("Section C", 1l),
 				new ClassSection("Section A", 2l),
+				new ClassSection("Section B", 2l),
 				new ClassSection("Section A", 3l));
 		classSectionRepository.saveAll(classSections);
 		
@@ -70,7 +83,10 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 				new SectionSubject("Kannada", 1l),
 				new SectionSubject("English", 2l),
 				new SectionSubject("Hindi", 2l),
-				new SectionSubject("Kannada", 2l));
+				new SectionSubject("Sanskrit", 2l),
+				new SectionSubject("English", 3l),
+				new SectionSubject("Hindi", 3l),
+				new SectionSubject("Telugu", 3l));
 		sectionSubjectRepository.saveAll(sectionSubjects);
 		
 		List<ClassPeriod> classPeriods = List.of(new ClassPeriod(LocalTime.of(8, 00), LocalTime.of(9, 50)),
@@ -175,7 +191,18 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 			student.setProfile(null);
 			students.add(student);
 		}
-		studentRepository.saveAll(students);
+		students = studentRepository.saveAll(students);
+		List<SectionStudent> sectionStudents = new ArrayList<>(); 
+		for (int i = 1; i <= students.size(); i++) {
+			Long section = 1l;
+			if (i > 15) {
+				section = 3l;
+			} else if (i > 10) {
+				section = 2l;
+			}
+			sectionStudents.add(new SectionStudent(new SectionStudentId(section, students.get(i-1).getId())));
+		}
+		sectionStudentRepository.saveAll(sectionStudents);
 		
 		List<Teacher> teachers = new ArrayList<>();
 		for (int i = 1; i <= 20; i++) {
@@ -194,5 +221,15 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 			teachers.add(teacher);
 		}
 		teacherRepository.saveAll(teachers);
+		
+		List<TeacherSubject> teacherSubjects = List.of(new TeacherSubject(1l, 1l),
+				new TeacherSubject(1l, 4l),
+				new TeacherSubject(1l, 7l));
+		teacherSubjectRepository.saveAll(teacherSubjects);
+		
+		List<User> users = new ArrayList<>();
+		users.add(new User(1l, "kharvi", "123", "student", true));
+		users.add(new User(2l, "kharvi2", "123", "student", true));
+		userRepository.saveAll(users);
 	}
 }

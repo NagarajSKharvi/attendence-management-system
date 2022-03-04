@@ -54,4 +54,8 @@ public class Student {
 	@Lob
 	@Column(name = "profile")
 	private byte[] profile;
+	
+	public String getName() {
+		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") + this.lastName).trim();
+	}
 }

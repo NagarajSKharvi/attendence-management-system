@@ -2,6 +2,8 @@ package ams.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,13 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 import ams.entity.Attendance;
 import ams.entity.ClassPeriod;
 import ams.entity.ClassSection;
+import ams.entity.SectionStudent;
+import ams.entity.SectionStudentId;
 import ams.entity.SectionSubject;
 import ams.entity.StudClass;
+import ams.entity.Student;
+import ams.entity.TeacherSubject;
 import ams.repository.AttendanceRepository;
 import ams.repository.ClassPeriodRepository;
 import ams.repository.ClassSectionRepository;
+import ams.repository.SectionStudentRepository;
 import ams.repository.SectionSubjectRepository;
 import ams.repository.StudClassRepository;
+import ams.repository.StudentRepository;
+import ams.repository.TeacherSubjectRepository;
 
 @RestController
 @RequestMapping("/ams")
@@ -36,10 +45,19 @@ public class AMSController {
 	private SectionSubjectRepository sectionSubjectRepository;
 	
 	@Autowired
+	private SectionStudentRepository sectionStudentRepository;
+	
+	@Autowired
+	private TeacherSubjectRepository teacherSubjectRepository;
+	
+	@Autowired
 	private ClassPeriodRepository classPeriodRepository;
 	
 	@Autowired
 	private AttendanceRepository attendanceRepository;
+	
+	@Autowired
+	private StudentRepository studentRepository;
 	
 	@GetMapping("/class")
 	public List<StudClass> listClass() {
@@ -56,9 +74,23 @@ public class AMSController {
 		return sectionSubjectRepository.findAllBySectionId(sectionId);
 	}
 	
+	@GetMapping("/student/{sectionId}")
+	public List<Student> listStudent(@PathVariable Long sectionId) {
+		List<SectionStudent> sectionStudents = sectionStudentRepository.findAllBySectionStudentIdSectionId(sectionId);
+		Set<Long> studentIds = sectionStudents.stream().map(SectionStudent::getSectionStudentId).map(SectionStudentId::getStudId)
+			.collect(Collectors.toSet());
+		return studentRepository.findAllByIdIn(studentIds);
+	}
+	
 	@GetMapping("/period")
 	public List<ClassPeriod> listPeriod() {
 		return classPeriodRepository.findAll();
+	}
+	
+	@GetMapping("/teacher-subject/{teacherId}")
+	public List<TeacherSubject> listTeacherSubject(@PathVariable Long teacherId) {
+		List<TeacherSubject> findByTeacherSubjectIdTeachId = teacherSubjectRepository.findByTeacherSubjectIdTeachId(teacherId);
+		return findByTeacherSubjectIdTeachId;
 	}
 	
 	@GetMapping("/attendance")
