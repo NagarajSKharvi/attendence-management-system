@@ -74,6 +74,11 @@ public class AMSController {
 		return sectionSubjectRepository.findAllBySectionId(sectionId);
 	}
 	
+	@GetMapping("/subject")
+	public List<SectionSubject> listSubject() {
+		return sectionSubjectRepository.findAll();
+	}
+	
 	@GetMapping("/student/{sectionId}")
 	public List<Student> listStudent(@PathVariable Long sectionId) {
 		List<SectionStudent> sectionStudents = sectionStudentRepository.findAllBySectionStudentIdSectionId(sectionId);

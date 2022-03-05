@@ -25,11 +25,13 @@ public class LoginController {
 	public LoginResponse login(@RequestBody LoginRequest loginRequest) {
 		System.out.println(loginRequest.getUsername());
 		System.out.println(loginRequest.getPassword());
-		User user = userRepository.findByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
+		User user = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername());
 		if (ObjectUtils.isEmpty(user)) {
-			return LoginResponse.builder().errorMessage("Not found").build();
+			return LoginResponse.builder().response("User not found").build();
+		} else if (!loginRequest.getPassword().equals(user.getPassword())) {
+			return LoginResponse.builder().response("Invalid Credentials").build();
 		}
-		return LoginResponse.builder().id(user.getId()).userName(user.getUsername())
+		return LoginResponse.builder().response("Success").id(user.getId()).userName(user.getUsername())
 			.userType(user.getAccountType()).build(); 
 	}
 }

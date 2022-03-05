@@ -15,7 +15,7 @@ import lombok.ToString;
 @Builder
 public class LoginResponse {
 	
-	private String errorMessage;
+	private String response;
 	private String userName;
 	private Long id;
 	private String userType;

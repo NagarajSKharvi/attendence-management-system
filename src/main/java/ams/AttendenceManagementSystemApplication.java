@@ -170,7 +170,7 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 				+ "    }"
 				+ "]";
 
-		List<Attendance> attendances = List.of(new Attendance(1l, 1l, 1l, LocalDate.of(2022, 02, 23), jsonString1),
+		List<Attendance> attendances = List.of(new Attendance(1l, 1l, 1l, LocalDate.of(2022, 03, 05), jsonString1),
 				new Attendance(2l, 3l, 1l, LocalDate.of(2022, 02, 23), jsonString2));
 		attendanceRepository.saveAll(attendances);
 		
@@ -224,7 +224,8 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 		
 		List<TeacherSubject> teacherSubjects = List.of(new TeacherSubject(1l, 1l),
 				new TeacherSubject(1l, 4l),
-				new TeacherSubject(1l, 7l));
+				new TeacherSubject(1l, 7l),
+				new TeacherSubject(2l, 3l));
 		teacherSubjectRepository.saveAll(teacherSubjects);
 		
 		List<User> users = new ArrayList<>();
