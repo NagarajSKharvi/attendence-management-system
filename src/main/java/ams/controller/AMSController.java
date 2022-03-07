@@ -102,4 +102,5 @@ public class AMSController {
 	public List<Attendance> listAttendance() {
 		return attendanceRepository.findAll();
 	}
+	
 }
