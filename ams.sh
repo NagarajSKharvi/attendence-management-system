@@ -6,7 +6,7 @@
 #usage		     :./ams.sh 2 in LINUX & sh ams.sh 2 in MAC OS
 #notes           :Install Vim
 echo "Git Pull"
-#git pull
+git pull
 echo "Git pull successful"
 #### JAR name start with
 jarName="ams-0.1"
