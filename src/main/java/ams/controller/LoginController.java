@@ -2,7 +2,6 @@ package ams.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,6 @@ import ams.request.LoginResponse;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin(origins = "http://localhost:19006")
 public class LoginController {
 	
 	@Autowired
