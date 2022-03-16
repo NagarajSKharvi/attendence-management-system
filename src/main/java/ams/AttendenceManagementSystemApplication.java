@@ -270,7 +270,7 @@ public class AttendenceManagementSystemApplication implements CommandLineRunner 
 			student.setFirstName("First Name " + i);
 			student.setMiddleName("Middle Name " + i);
 			student.setLastName("Last Name " + i);
-			if (i % 2 == 0) {
+			if (i % 2 != 0) {
 				student.setGender("Male");
 			} else {
 				student.setGender("Female");

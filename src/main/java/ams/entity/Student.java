@@ -59,6 +59,7 @@ public class Student {
 	private String email;
 	
 	public String getName() {
-		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") + this.lastName).trim();
+		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") 
+				+ (this.lastName != null ? this.lastName : "") + this.lastName).trim();
 	}
 }
