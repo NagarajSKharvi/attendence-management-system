@@ -1,5 +1,7 @@
 package ams.entity;
 
+import java.time.LocalDate;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,9 +35,17 @@ public class StudClass {
 	@Column(name = "class_year")
 	private Integer classYear;
 	
-	public StudClass(String className, Integer classYear) {
+	@Column(name = "start_date")
+	private LocalDate startDate;
+	
+	@Column(name = "end_date")
+	private LocalDate endDate;
+	
+	public StudClass(String className, Integer classYear, LocalDate startDate, LocalDate endDate) {
 		super();
 		this.className = className;
 		this.classYear = classYear;
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 }

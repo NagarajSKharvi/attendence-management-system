@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ams.entity.User;
+import ams.entity.Users;
 import ams.repository.UserRepository;
 import ams.request.LoginRequest;
 import ams.request.LoginResponse;
@@ -23,7 +23,7 @@ public class LoginController {
 	public LoginResponse login(@RequestBody LoginRequest loginRequest) {
 		System.out.println(loginRequest.getUsername());
 		System.out.println(loginRequest.getPassword());
-		User user = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername());
+		Users user = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername());
 		if (ObjectUtils.isEmpty(user)) {
 			return LoginResponse.builder().response("User not found").build();
 		} else if (!loginRequest.getPassword().equals(user.getPassword())) {

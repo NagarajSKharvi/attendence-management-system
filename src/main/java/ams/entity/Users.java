@@ -19,13 +19,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "users")
+public class Users {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
-	private String userId;
+	private Long userId;
 	
 	@Column(name = "id")
 	private Long id;
@@ -42,7 +42,7 @@ public class User {
 	@Column(name = "activated")
 	private boolean activated;
 
-	public User(Long id, String username, String password, String accountType, boolean activated) {
+	public Users(Long id, String username, String password, String accountType, boolean activated) {
 		super();
 		this.id = id;
 		this.username = username;

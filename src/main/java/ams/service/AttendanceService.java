@@ -1,6 +1,7 @@
 package ams.service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ams.entity.Attendance;
 import ams.entity.ClassPeriod;
+import ams.entity.ClassSection;
 import ams.entity.SectionStudent;
 import ams.entity.SectionStudentId;
 import ams.entity.SectionSubject;
@@ -86,6 +88,31 @@ public class AttendanceService {
 					sectionSubject, teacher, isPresent));
 		});
 		return sAttendanceResponses;
+	}
+	
+	public Float getStudentAttendancePercentage(Long studentId) {
+		SectionStudent sectionStudent = sectionStudentRepository.findAllBySectionStudentIdStudId(studentId);
+		List<SectionSubject> subjects = sectionSubjectRepository.findAllBySectionId(sectionStudent.getSectionStudentId().getSectionId());
+		
+		ClassSection classSection = classSectionRepository.findBySectionId(sectionStudent.getSectionStudentId().getSectionId());
+		Set<Long> subjectIds = subjects.stream().map(SectionSubject::getSubjectId).collect(Collectors.toSet());
+		List<Attendance> attendances = attendanceRepository.findBySubjectIdIn(subjectIds);
+		
+		LocalDate endDate = LocalDate.now().isBefore(classSection.getStudClass().getEndDate()) ? LocalDate.now() : classSection.getStudClass().getEndDate();
+		long totalDays = ChronoUnit.DAYS.between(classSection.getStudClass().getStartDate(), endDate);
+		long totalWeeks = totalDays / 7;
+		long extraDays = totalDays - (totalWeeks * 7);
+		long actualDays = (totalWeeks * 6) + extraDays;
+		long counter = 0;
+		for(Attendance a : attendances) {
+			List<StudentAttendanceResponse> resp = CommonUtil.getResponseFromString(a.getJson());
+			long count = resp.stream().filter(r -> r.getStudentId().equals(studentId) && r.isPresent()).count();
+			if (count > 0l) {
+				counter++;
+			}
+		}
+		float percentage = (counter * 100) / actualDays;
+		return percentage;
 	}
 	
 	public List<AttendanceResponse> list(AttendenceRequest attendenceRequest) {
@@ -239,4 +266,6 @@ public class AttendanceService {
 		attendanceResponse.setStudentAttendanceResponses(resp);
 		return attendanceResponse;
 	}
+
+	
 }
