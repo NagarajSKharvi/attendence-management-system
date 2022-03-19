@@ -278,7 +278,6 @@ public class LocalCMDRunner implements CommandLineRunner {
 			student.setDob(LocalDate.of(1996, 05, 01).plusDays(i));
 			student.setMobileNumber(Long.valueOf("7204929" + String.format("%03d" , i)));
 			student.setProfile(null);
-			student.setEmail("email" + i + "@gmail.com");
 			students.add(student);
 		}
 		students = studentRepository.saveAll(students);

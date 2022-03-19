@@ -55,9 +55,6 @@ public class Student {
 	@Column(name = "profile")
 	private byte[] profile;
 	
-	@Column(name = "email")
-	private String email;
-	
 	public String getName() {
 		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") 
 				+ (this.lastName != null ? this.lastName : "") + this.lastName).trim();
