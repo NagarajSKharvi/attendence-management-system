@@ -33,6 +33,7 @@ import ams.repository.StudClassRepository;
 import ams.repository.StudentRepository;
 import ams.repository.TeacherRepository;
 import ams.request.AttendenceRequest;
+import ams.request.StudentAttendanceRequest;
 import ams.response.AttendanceResponse;
 import ams.response.SAttendanceResponse;
 import ams.response.StudentAttendanceResponse;
@@ -144,13 +145,10 @@ public class AttendanceService {
 	}
 	
 	public Attendance create(AttendenceRequest attendenceRequest) {
-		String jsonString = null;
-		try {
-			jsonString = new ObjectMapper().writeValueAsString(attendenceRequest.getStudentAttendanceRequests());
-		} catch (JsonProcessingException e) {
-		}
+		List<Long> studentIds = attendenceRequest.getStudentAttendanceRequests().stream().filter(a -> a.isPresent()).map(StudentAttendanceRequest::getStudentId)
+			.collect(Collectors.toList());
 		Attendance attendance = new Attendance(attendenceRequest.getPeriodId(), attendenceRequest.getSubjectId(),
-			attendenceRequest.getTeachId(), attendenceRequest.getDate(), jsonString);
+			attendenceRequest.getTeachId(), attendenceRequest.getDate(), studentIds.toString());
 		return attendanceRepository.save(attendance);
 	}
 	
@@ -237,22 +235,22 @@ public class AttendanceService {
 	}
 	
 	private List<StudentAttendanceResponse> getStudentAttendanceResponses(Attendance attendance) {
-		List<StudentAttendanceResponse> resp = null;
+		List<Long> resp = null;
 		try {
-			resp = new ObjectMapper().readValue(attendance.getJson(), new TypeReference<List<StudentAttendanceResponse>>(){});
+			resp = new ObjectMapper().readValue(attendance.getJson(), new TypeReference<List<Long>>(){});
 		} catch (JsonMappingException e) {
 		} catch (JsonProcessingException e) {
 		}
-		Set<Long> sIds = resp.stream().map(StudentAttendanceResponse::getStudentId).collect(Collectors.toSet());
-		List<Student> students = studentRepository.findAllByIdIn(sIds);
-		resp.stream().forEach(res -> {
-			Student student = students.stream().filter(s -> s.getId().equals(res.getStudentId())).findAny().orElse(null);
-			if (!ObjectUtils.isEmpty(student)) {
-				res.setRollNumber(student.getRollNumber());
-			}
-			
-		});
-		return resp;
+		SectionSubject sectionSubject = sectionSubjectRepository.findById(attendance.getSubjectId()).orElse(null);
+		List<SectionStudent> sectionStudents = sectionStudentRepository.findAllBySectionStudentIdSectionId(sectionSubject.getSectionId());
+		Set<Long> studentIds = sectionStudents.stream().map(SectionStudent::getSectionStudentId).map(SectionStudentId::getStudId).collect(Collectors.toSet());
+		List<Student> studentsInDb = studentRepository.findAllByIdIn(studentIds);
+		List<StudentAttendanceResponse> result = new ArrayList<>();
+		for (Student student : studentsInDb) {
+			boolean isPresent = resp.stream().anyMatch(r -> r.equals(student.getId()));
+			result.add(new StudentAttendanceResponse(student.getId(), student.getRollNumber(), isPresent));
+		}
+		return result;
 	}
 	
 	private AttendanceResponse mapAttendanceResponse(Long attendanceId, Attendance attendance, ClassPeriod classPeriod,

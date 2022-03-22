@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,9 +31,11 @@ public class ClassPeriod {
 	@Column(name = "period_id")
 	private Long periodId;
 	
+	@JsonFormat(pattern = "hh:mm a")
 	@Column(name = "from_time")
 	private LocalTime fromTime;
 	
+	@JsonFormat(pattern = "hh:mm a")
 	@Column(name = "to_time")
 	private LocalTime toTime;
 
