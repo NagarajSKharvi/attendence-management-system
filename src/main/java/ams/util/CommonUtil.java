@@ -21,14 +21,13 @@ public class CommonUtil {
 		return jsonString;
 	}
 	
-	public static List<StudentAttendanceResponse> getResponseFromString(Object object) {
-		String data = object.toString();
-		List<StudentAttendanceResponse> studentAttendanceResponses = new ArrayList<>();
+	public static List<Long> getResponseFromString(Object object) {
+		List<Long> resp = new ArrayList<>();
 		try {
-			studentAttendanceResponses = new ObjectMapper().readValue(data, new TypeReference<List<StudentAttendanceResponse>>(){});
+			resp = new ObjectMapper().readValue(object.toString(), new TypeReference<List<Long>>(){});
 		} catch (JsonMappingException e) {
 		} catch (JsonProcessingException e) {
 		}
-		return studentAttendanceResponses;
+		return resp;
 	}
 }

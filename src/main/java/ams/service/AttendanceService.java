@@ -76,10 +76,9 @@ public class AttendanceService {
 		
 		List<SAttendanceResponse> sAttendanceResponses = new ArrayList<>();
 		attendances.stream().forEach(a -> {
-			List<StudentAttendanceResponse> resp = CommonUtil.getResponseFromString(a.getJson());
+			List<Long> resp = CommonUtil.getResponseFromString(a.getJson());
 			String isPresent = "No";
-			StudentAttendanceResponse studentAttendanceResponse = resp.stream().filter(r -> r.getStudentId().equals(studentId)).findAny().orElse(null);
-			if (!ObjectUtils.isEmpty(studentAttendanceResponse) && studentAttendanceResponse.isPresent()) {
+			if (resp.stream().anyMatch(r -> resp.contains(studentId))) {
 				isPresent = "Yes";
 			}
 			ClassPeriod classPeriod = classPeriods.stream().filter(cp -> cp.getPeriodId().equals(a.getAttendanceId())).findAny().orElse(null);
@@ -91,7 +90,7 @@ public class AttendanceService {
 		return sAttendanceResponses;
 	}
 	
-	public Float getStudentAttendancePercentage(Long studentId) {
+	public String getStudentAttendancePercentage(Long studentId) {
 		SectionStudent sectionStudent = sectionStudentRepository.findAllBySectionStudentIdStudId(studentId);
 		List<SectionSubject> subjects = sectionSubjectRepository.findAllBySectionId(sectionStudent.getSectionStudentId().getSectionId());
 		
@@ -106,14 +105,18 @@ public class AttendanceService {
 		long actualDays = (totalWeeks * 6) + extraDays;
 		long counter = 0;
 		for(Attendance a : attendances) {
-			List<StudentAttendanceResponse> resp = CommonUtil.getResponseFromString(a.getJson());
-			long count = resp.stream().filter(r -> r.getStudentId().equals(studentId) && r.isPresent()).count();
-			if (count > 0l) {
+			List<Long> studIds = CommonUtil.getResponseFromString(a.getJson());
+			if (studIds.contains(studentId)) {
 				counter++;
 			}
 		}
-		float percentage = (counter * 100) / actualDays;
-		return percentage;
+		if (classSection.getClassId() < 5) {
+			counter = counter/2;
+		} else {
+			counter = counter/4;
+		}
+		float percentage = (float) (counter * 100) / actualDays;
+		return String.format("%.2f", percentage);
 	}
 	
 	public List<AttendanceResponse> list(AttendenceRequest attendenceRequest) {
@@ -235,7 +238,7 @@ public class AttendanceService {
 	}
 	
 	private List<StudentAttendanceResponse> getStudentAttendanceResponses(Attendance attendance) {
-		List<Long> resp = null;
+		List<Long> resp = new ArrayList<>();
 		try {
 			resp = new ObjectMapper().readValue(attendance.getJson(), new TypeReference<List<Long>>(){});
 		} catch (JsonMappingException e) {

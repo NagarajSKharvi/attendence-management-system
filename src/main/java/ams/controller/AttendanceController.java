@@ -29,7 +29,7 @@ public class AttendanceController {
 	}
 	
 	@GetMapping("/student/pecentage/{studentId}")
-	public Float getStudentAttendancePercentage(@PathVariable Long studentId) {
+	public String getStudentAttendancePercentage(@PathVariable Long studentId) {
 		return attendanceService.getStudentAttendancePercentage(studentId);
 	}
 	
