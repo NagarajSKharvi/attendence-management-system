@@ -81,11 +81,11 @@ public class AttendanceService {
 			if (resp.stream().anyMatch(r -> resp.contains(studentId))) {
 				isPresent = "Yes";
 			}
-			ClassPeriod classPeriod = classPeriods.stream().filter(cp -> cp.getPeriodId().equals(a.getAttendanceId())).findAny().orElse(null);
+			ClassPeriod classPeriod = classPeriods.stream().filter(cp -> cp.getPeriodId().equals(a.getPeriodId())).findAny().orElse(null);
 			SectionSubject sectionSubject = sectionSubjects.stream().filter(ss -> ss.getSubjectId().equals(a.getSubjectId())).findAny().orElse(null);
 			Teacher teacher = teachers.stream().filter(ss -> ss.getId().equals(a.getTeachId())).findAny().orElse(null);
-			sAttendanceResponses.add(new SAttendanceResponse(a.getAttendanceId(), a.getDate(), classPeriod,
-					sectionSubject, teacher, isPresent));
+			sAttendanceResponses.add(new SAttendanceResponse(a.getAttendanceId(), a.getDate(), classPeriod.getFromTime(),
+					sectionSubject.getSubjectName(), teacher.getName(), isPresent));
 		});
 		return sAttendanceResponses;
 	}
