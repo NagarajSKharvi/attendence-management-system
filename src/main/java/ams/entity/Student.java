@@ -60,6 +60,6 @@ public class Student {
 	
 	public String getName() {
 		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") 
-				+ (this.lastName != null ? this.lastName : "") + this.lastName).trim();
+				+ (this.lastName != null ? this.lastName : "")).trim();
 	}
 }
