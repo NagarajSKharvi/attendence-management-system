@@ -12,4 +12,5 @@ import ams.entity.Student;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 	
 	List<Student> findAllByIdIn(Set<Long> studentIds);
+	Student findByRollNumber(String rollNumber);
 }

@@ -1,0 +1,21 @@
+package ams.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class AccountRequest {
+
+	private boolean isStudent;
+	private String number;
+	private String username;
+	private String password;
+	
+}

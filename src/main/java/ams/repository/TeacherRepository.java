@@ -12,4 +12,5 @@ import ams.entity.Teacher;
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 	
 	List<Teacher> findAllByIdIn(Set<Long> teachIds);
+	Teacher findByTeacherNumber(String teacherNumber);
 }
