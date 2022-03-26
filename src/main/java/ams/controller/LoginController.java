@@ -16,6 +16,7 @@ import ams.repository.UserRepository;
 import ams.request.AccountRequest;
 import ams.request.LoginRequest;
 import ams.request.LoginResponse;
+import ams.request.ResetRequest;
 
 @RestController
 public class LoginController {
@@ -70,6 +71,23 @@ public class LoginController {
 		
 		user = Users.builder().id(userId).accountType(userType).username(accountRequest.getUsername())
 				.password(accountRequest.getPassword()).build();
+		return userRepository.save(user);
+	}
+	
+	@PostMapping("/reset")
+	public Users reset(@RequestBody ResetRequest resetRequest) throws Exception {
+		Student student = studentRepository.findByRollNumber(resetRequest.getNumber());
+		if (ObjectUtils.isEmpty(student)) {
+			Teacher teacher = teacherRepository.findByTeacherNumber(resetRequest.getNumber());
+			if (ObjectUtils.isEmpty(teacher)) {
+				throwError("Invalid number");
+			}
+		}
+		Users user = userRepository.findByUsernameIgnoreCase(resetRequest.getUsername());
+		if (ObjectUtils.isEmpty(user)) {
+			throwError("Invalid Username");
+		}
+		user.setPassword(resetRequest.getPassword());
 		return userRepository.save(user);
 	}
 	
