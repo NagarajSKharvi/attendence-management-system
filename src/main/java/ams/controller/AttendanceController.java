@@ -33,9 +33,9 @@ public class AttendanceController {
 		return attendanceService.getStudentAttendancePercentage(studentId);
 	}
 	
-	@GetMapping("/add/{sectionId}")
-	public AttendanceResponse getAttendanceResourceBySection(@PathVariable Long sectionId) {
-		return attendanceService.getAttendanceResourceBySection(sectionId);
+	@GetMapping("/add/{subjectId}")
+	public AttendanceResponse getAttendanceResourceBySubject(@PathVariable Long subjectId) {
+		return attendanceService.getAttendanceResourceBySubject(subjectId);
 	}
 	
 	@PostMapping("")

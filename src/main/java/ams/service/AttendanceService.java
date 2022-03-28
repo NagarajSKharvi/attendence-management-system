@@ -132,11 +132,12 @@ public class AttendanceService {
 		return mapAttendanceResponse(attendanceId, attendance, classPeriod, sectionSubject, teacher, getStudentAttendanceResponses(attendance));
 	}
 
-	public AttendanceResponse getAttendanceResourceBySection(Long sectionId) {
+	public AttendanceResponse getAttendanceResourceBySubject(Long subjectId) {
+		SectionSubject sectionSubject = sectionSubjectRepository.findAllBySubjectId(subjectId);
 		AttendanceResponse attendanceResponse = new AttendanceResponse();
 		attendanceResponse.setDate(LocalDate.now());
 		List<StudentAttendanceResponse> studentAttendanceResponses = new ArrayList<>();
-		List<SectionStudent> sectionStudents = sectionStudentRepository.findAllBySectionStudentIdSectionId(sectionId);
+		List<SectionStudent> sectionStudents = sectionStudentRepository.findAllBySectionStudentIdSectionId(sectionSubject.getSectionId());
 		Set<Long> studentIds = sectionStudents.stream().map(SectionStudent::getSectionStudentId).map(SectionStudentId::getStudId)
 				.collect(Collectors.toSet());
 		List<Student> students = studentRepository.findAllByIdIn(studentIds);
