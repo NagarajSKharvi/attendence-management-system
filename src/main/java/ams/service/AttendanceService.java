@@ -34,6 +34,7 @@ import ams.repository.StudentRepository;
 import ams.repository.TeacherRepository;
 import ams.request.AttendenceRequest;
 import ams.request.StudentAttendanceRequest;
+import ams.response.AttendancePercentage;
 import ams.response.AttendanceResponse;
 import ams.response.SAttendanceResponse;
 import ams.response.StudentAttendanceResponse;
@@ -116,6 +117,8 @@ public class AttendanceService {
 			counter = counter/4;
 		}
 		float percentage = (float) (counter * 100) / actualDays;
+		AttendancePercentage attendancePercentage = new AttendancePercentage();
+		attendancePercentage.setClassPercentage(String.format("%.2f", percentage));
 		return String.format("%.2f", percentage);
 	}
 	
@@ -148,7 +151,8 @@ public class AttendanceService {
 		return attendanceResponse;
 	}
 	
-	public Attendance create(AttendenceRequest attendenceRequest) {
+	public Attendance create(AttendenceRequest attendenceRequest) throws Exception {
+		validate(attendenceRequest);
 		List<Long> studentIds = attendenceRequest.getStudentAttendanceRequests().stream().filter(a -> a.isPresent()).map(StudentAttendanceRequest::getStudentId)
 			.collect(Collectors.toList());
 		Attendance attendance = new Attendance(attendenceRequest.getPeriodId(), attendenceRequest.getSubjectId(),
@@ -156,6 +160,23 @@ public class AttendanceService {
 		return attendanceRepository.save(attendance);
 	}
 	
+	private void validate(AttendenceRequest attendenceRequest) throws Exception {
+		LocalDate localDate = LocalDate.now();
+		
+		if (attendenceRequest.getDate().isAfter(localDate)) {
+			throw new Exception("Cannot add Attendance for future dates");
+		} else if (attendenceRequest.getDate().isBefore(localDate.minusDays(31))) {
+			throw new Exception("Attendance can be only added for today or past 31 days");
+		}
+			
+		List<Attendance> list = attendanceRepository.findByPeriodIdAndSubjectIdAndTeachIdAndDate(attendenceRequest.getPeriodId(), attendenceRequest.getSubjectId(),
+				attendenceRequest.getTeachId(), attendenceRequest.getDate());
+		if (!list.isEmpty()) {
+			throw new Exception("Attendance already exists for the date, period, section and subject");
+		}
+		
+	}
+
 	private List<Attendance> getAttendence(AttendenceRequest attendenceRequest) {
 		Long periodId = attendenceRequest.getPeriodId();
 		Long subjectId = attendenceRequest.getSubjectId();

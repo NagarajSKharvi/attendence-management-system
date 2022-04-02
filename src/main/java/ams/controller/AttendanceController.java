@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ams.entity.Attendance;
 import ams.request.AttendenceRequest;
+import ams.response.AttendancePercentage;
 import ams.response.AttendanceResponse;
 import ams.response.SAttendanceResponse;
 import ams.service.AttendanceService;
@@ -39,7 +40,7 @@ public class AttendanceController {
 	}
 	
 	@PostMapping("")
-	public Attendance create(@RequestBody AttendenceRequest attendenceRequest) {
+	public Attendance create(@RequestBody AttendenceRequest attendenceRequest) throws Exception {
 		return attendanceService.create(attendenceRequest);
 	}
 	
