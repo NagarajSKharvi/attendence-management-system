@@ -17,6 +17,7 @@ import ams.entity.ClassSection;
 import ams.entity.SectionStudent;
 import ams.entity.SectionStudentId;
 import ams.entity.SectionSubject;
+import ams.entity.Semester;
 import ams.entity.StudClass;
 import ams.entity.Student;
 import ams.entity.TeacherSubject;
@@ -25,6 +26,7 @@ import ams.repository.ClassPeriodRepository;
 import ams.repository.ClassSectionRepository;
 import ams.repository.SectionStudentRepository;
 import ams.repository.SectionSubjectRepository;
+import ams.repository.SemesterRepository;
 import ams.repository.StudClassRepository;
 import ams.repository.StudentRepository;
 import ams.repository.TeacherSubjectRepository;
@@ -57,6 +59,9 @@ public class AMSController {
 	@Autowired
 	private StudentRepository studentRepository;
 	
+	@Autowired
+	private SemesterRepository semesterRepository;
+	
 	@GetMapping("/class")
 	public List<StudClass> listClass() {
 		return studClassRepository.findByClassYear(LocalDate.now().getYear());
@@ -88,6 +93,11 @@ public class AMSController {
 	@GetMapping("/period")
 	public List<ClassPeriod> listPeriod() {
 		return classPeriodRepository.findAll();
+	}
+	
+	@GetMapping("/semester")
+	public List<Semester> listsSemester() {
+		return semesterRepository.findAll();
 	}
 	
 	@GetMapping("/teacher-subject/{teacherId}")

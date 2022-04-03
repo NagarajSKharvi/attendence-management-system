@@ -34,6 +34,11 @@ public class AttendanceController {
 		return attendanceService.getStudentAttendancePercentage(studentId);
 	}
 	
+	@GetMapping("/student/pecentage/all/{studentId}")
+	public AttendancePercentage getStudentAttendancePercentageBySem(@PathVariable Long studentId) {
+		return attendanceService.getStudentAttendancePercentageBySem(studentId);
+	}
+	
 	@GetMapping("/add/{subjectId}")
 	public AttendanceResponse getAttendanceResourceBySubject(@PathVariable Long subjectId) {
 		return attendanceService.getAttendanceResourceBySubject(subjectId);

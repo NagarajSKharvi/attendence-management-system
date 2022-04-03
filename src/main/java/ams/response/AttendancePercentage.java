@@ -1,7 +1,8 @@
 package ams.response;
 
-import java.util.Map;
+import java.util.List;
 
+import ams.entity.Percentage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,5 @@ import lombok.ToString;
 @ToString
 public class AttendancePercentage {
 	
-	private String classPercentage;
-	private Map<String, String> subjectPercentage;
+	private List<Percentage> percentages;
 }

@@ -38,13 +38,21 @@ public class SectionSubject {
 	@Column(name = "section_id")
 	private Long sectionId;
 	
+	@Column(name = "sem_id")
+	private Long semId;
+	
 	@ManyToOne
 	@JoinColumn(name = "section_id", insertable = false, updatable = false, nullable = false)
 	private ClassSection classSection;
 
-	public SectionSubject(String subjectName, Long sectionId) {
+	@ManyToOne
+	@JoinColumn(name = "sem_id", insertable = false, updatable = false, nullable = false)
+	private Semester semester;
+	
+	public SectionSubject(String subjectName, Long sectionId, Long semId) {
 		super();
 		this.subjectName = subjectName;
 		this.sectionId = sectionId;
+		this.semId = semId;
 	}
 }

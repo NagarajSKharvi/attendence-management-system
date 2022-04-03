@@ -19,9 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ams.entity.Attendance;
 import ams.entity.ClassPeriod;
 import ams.entity.ClassSection;
+import ams.entity.Percentage;
 import ams.entity.SectionStudent;
 import ams.entity.SectionStudentId;
 import ams.entity.SectionSubject;
+import ams.entity.Semester;
 import ams.entity.Student;
 import ams.entity.Teacher;
 import ams.repository.AttendanceRepository;
@@ -117,9 +119,49 @@ public class AttendanceService {
 			counter = counter/4;
 		}
 		float percentage = (float) (counter * 100) / actualDays;
-		AttendancePercentage attendancePercentage = new AttendancePercentage();
-		attendancePercentage.setClassPercentage(String.format("%.2f", percentage));
 		return String.format("%.2f", percentage);
+	}
+	
+	public AttendancePercentage getStudentAttendancePercentageBySem(Long studentId) {
+		SectionStudent sectionStudent = sectionStudentRepository.findAllBySectionStudentIdStudId(studentId);
+		List<SectionSubject> subjects = sectionSubjectRepository.findAllBySectionId(sectionStudent.getSectionStudentId().getSectionId());
+		
+		Set<Long> subjectIds = subjects.stream().map(SectionSubject::getSubjectId).collect(Collectors.toSet());
+		List<Attendance> attendances = attendanceRepository.findBySubjectIdIn(subjectIds);
+		
+		List<Percentage> list = new ArrayList<>();
+		Set<Semester> semesters = subjects.stream().map(SectionSubject::getSemester).collect(Collectors.toSet());
+		for (Semester semester : semesters) {
+			List<SectionSubject> semSubjects = subjects.stream().filter(ss -> ss.getSemId().equals(semester.getSemId())).collect(Collectors.toList());
+			Set<Long> semSubjectIds = semSubjects.stream().map(SectionSubject :: getSubjectId).collect(Collectors.toSet());
+			List<Attendance> semAttendances = attendances.stream().filter(a -> semSubjectIds.contains(a.getSubjectId())).collect(Collectors.toList());
+			long totalDays = ChronoUnit.DAYS.between(semester.getStartDate(), semester.getEndDate()) + 2;
+			long totalWeeks = totalDays / 7;
+			long extraDays = totalDays - (totalWeeks * 7);
+			long actualDays = (totalWeeks * 6) + extraDays;
+			long counter = semAttendances.stream().filter(s -> CommonUtil.getResponseFromString(s.getJson()).contains(studentId)).count();
+			counter = counter/4;
+			float percentage = (float) (counter * 100) / actualDays;
+			list.add(new Percentage(semester.getSemesterName(), String.format("%.2f", percentage), new ArrayList<>()));
+		}
+		for (SectionSubject subject : subjects) {
+			List<Attendance> subAttendances = attendances.stream().filter(a -> subject.getSubjectId().equals(a.getSubjectId())).collect(Collectors.toList());
+			long totalDays = ChronoUnit.DAYS.between(subject.getSemester().getStartDate(), subject.getSemester().getEndDate()) + 2;
+			long totalWeeks = totalDays / 7;
+			long extraDays = totalDays - (totalWeeks * 7);
+			long actualDays = (totalWeeks * 6) + extraDays;
+			long totalSubClasses = (actualDays * 4) / 7;
+			
+			long counter = subAttendances.stream().filter(s -> CommonUtil.getResponseFromString(s.getJson()).contains(studentId)).count();
+			float percentage = (float) (counter * 100) / totalSubClasses;
+			for (Percentage p : list) {
+				if (p.getType().equals(subject.getSemester().getSemesterName())) {
+					p.getPercentages().add(new Percentage(subject.getSubjectName(), String.format("%.2f", percentage)));
+				}
+			}
+//			list.add(new Percentage(subject.getSubjectName(), String.format("%.2f", percentage)));
+		}
+		return new AttendancePercentage(list);
 	}
 	
 	public List<AttendanceResponse> list(AttendenceRequest attendenceRequest) {
