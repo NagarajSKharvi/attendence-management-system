@@ -1,8 +1,11 @@
 package ams.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -159,9 +162,22 @@ public class AttendanceService {
 					p.getPercentages().add(new Percentage(subject.getSubjectName(), String.format("%.2f", percentage)));
 				}
 			}
-//			list.add(new Percentage(subject.getSubjectName(), String.format("%.2f", percentage)));
 		}
-		return new AttendancePercentage(list);
+		List<Percentage> monthPercentages = new ArrayList<>();
+		Iterator<Semester> iterator = semesters.iterator();
+		LocalDate start = iterator.next().getStartDate();
+		for (int i = start.getMonthValue(); i <= 12; i ++) {
+			LocalDate startDate = start;
+			LocalDate end = start.plusMonths(1);
+			List<Attendance> monthAtt = attendances.stream().filter(a -> startDate.isBefore(a.getDate()) && a.getDate().isBefore(end)).collect(Collectors.toList());
+			long days = monthAtt.size()/4;
+			
+			Long weekDays = getWeekDays(start.getYear(), start.getMonthValue());
+			float percentage = (float) (days * 100) / weekDays;
+			monthPercentages.add(new Percentage(start.getMonth().toString(), String.format("%.2f", percentage)));
+			start = end;
+		}
+		return new AttendancePercentage(list, monthPercentages);
 	}
 	
 	public List<AttendanceResponse> list(AttendenceRequest attendenceRequest) {
@@ -332,5 +348,12 @@ public class AttendanceService {
 		return attendanceResponse;
 	}
 
-	
+	static Long getWeekDays(int year, int month) {
+        LocalDate firstDateOfTheMonth = YearMonth.of(year, month).atDay(1);
+        
+        return firstDateOfTheMonth
+                .datesUntil(firstDateOfTheMonth.plusMonths(1))
+                .filter(date -> date.getDayOfWeek() != DayOfWeek.SUNDAY)
+                .count();
+    }
 }
