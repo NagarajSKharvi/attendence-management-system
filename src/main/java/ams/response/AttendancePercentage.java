@@ -17,5 +17,5 @@ import lombok.ToString;
 public class AttendancePercentage {
 	
 	private List<Percentage> percentages;
-	private List<Percentage> monthercentages;
+	private List<Percentage> monthPercentages;
 }
