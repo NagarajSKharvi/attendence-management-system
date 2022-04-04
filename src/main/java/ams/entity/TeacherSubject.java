@@ -40,15 +40,3 @@ public class TeacherSubject {
 		this.teacherSubjectId = new TeacherSubjectId(teachId, subId);
 	}
 }
-
-@Embeddable
-@NoArgsConstructor
-@AllArgsConstructor
-class TeacherSubjectId implements Serializable {
-	
-	@Column(name = "teach_id")
-	private Long teachId;
-	
-	@Column(name = "sub_id")
-	private Long subId;
-}

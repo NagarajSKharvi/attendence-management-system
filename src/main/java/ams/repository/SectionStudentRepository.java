@@ -11,5 +11,6 @@ import ams.entity.SectionStudent;
 public interface SectionStudentRepository extends JpaRepository<SectionStudent, Long> {
 	
 	SectionStudent findAllBySectionStudentIdStudId(Long studId);
+	SectionStudent findAllBySectionStudentIdStudIdAndSectionStudentIdSectionId(Long studId, Long sectionId);
 	List<SectionStudent> findAllBySectionStudentIdSectionId(Long sectionId);
 }
