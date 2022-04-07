@@ -5,9 +5,11 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +149,7 @@ public class AttendanceService {
 			float percentage = (float) (counter * 100) / actualDays;
 			list.add(new Percentage(semester.getSemesterName(), String.format("%.2f", percentage), new ArrayList<>()));
 		}
+		Collections.sort(list, Comparator.comparing(Percentage::getType));
 		for (SectionSubject subject : subjects) {
 			List<Attendance> subAttendances = attendances.stream().filter(a -> subject.getSubjectId().equals(a.getSubjectId())).collect(Collectors.toList());
 			long totalDays = ChronoUnit.DAYS.between(subject.getSemester().getStartDate(), subject.getSemester().getEndDate()) + 2;
@@ -164,11 +167,11 @@ public class AttendanceService {
 			}
 		}
 		List<Percentage> monthPercentages = new ArrayList<>();
-		Iterator<Semester> iterator = semesters.iterator();
-		LocalDate start = iterator.next().getStartDate();
-		for (int i = start.getMonthValue(); i <= 12; i ++) {
+		LocalDate start = Collections.min(semesters.stream().map(Semester :: getStartDate).collect(Collectors.toList()));
+		
+		for (int i = 0; i < 12; i ++) {
 			LocalDate startDate = start;
-			LocalDate end = start.plusMonths(1);
+			LocalDate end = startDate.plusMonths(1);
 			List<Attendance> monthAtt = attendances.stream().filter(a -> startDate.isBefore(a.getDate()) && a.getDate().isBefore(end)).collect(Collectors.toList());
 			long days = monthAtt.size()/4;
 			
@@ -227,8 +230,8 @@ public class AttendanceService {
 			throw new Exception("Attendance can be only added for today or past 31 days");
 		}
 			
-		List<Attendance> list = attendanceRepository.findByPeriodIdAndSubjectIdAndTeachIdAndDate(attendenceRequest.getPeriodId(), attendenceRequest.getSubjectId(),
-				attendenceRequest.getTeachId(), attendenceRequest.getDate());
+		List<Attendance> list = attendanceRepository.findByPeriodIdAndSubjectIdAndDate(attendenceRequest.getPeriodId(), attendenceRequest.getSubjectId(),
+				attendenceRequest.getDate());
 		if (!list.isEmpty()) {
 			throw new Exception("Attendance already exists for the date, period, section and subject");
 		}
