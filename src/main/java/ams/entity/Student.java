@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -57,6 +58,9 @@ public class Student {
 	@Lob
 	@Column(name = "profile")
 	private byte[] profile;
+	
+	@Transient
+	private Long sectionId;
 	
 	public String getName() {
 		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") 

@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ams.entity.SectionStudent;
+import ams.entity.SectionStudentId;
 import ams.entity.Student;
+import ams.repository.SectionStudentRepository;
 import ams.repository.StudentRepository;
 
 @RestController
@@ -21,11 +24,14 @@ public class StudentController {
 	
 	@Autowired
 	private StudentRepository studentRepository;
-	
+	@Autowired
+	private SectionStudentRepository sectionStudentRepository;
 	
 	@PostMapping("")
 	public Student create(@RequestBody Student student) {
 		Student studentInDb = studentRepository.save(student);
+		SectionStudent sectionStudent = new SectionStudent(new SectionStudentId(student.getSectionId(), studentInDb.getId()));
+		sectionStudentRepository.save(sectionStudent);
 		return studentInDb;
 	}
 	
