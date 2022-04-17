@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ams.entity.Teacher;
+import ams.entity.TeacherSubject;
+import ams.entity.TeacherSubjectId;
 import ams.repository.TeacherRepository;
+import ams.repository.TeacherSubjectRepository;
 
 @RestController
 @RequestMapping("/teachers")
@@ -21,11 +24,13 @@ public class TeacherController {
 	
 	@Autowired
 	private TeacherRepository teacherRepository;
-	
+	@Autowired
+	private TeacherSubjectRepository teacherSubjectRepository;
 	
 	@PostMapping("")
 	public Teacher create(@RequestBody Teacher teacher) {
 		Teacher teacherInDb = teacherRepository.save(teacher);
+		teacherSubjectRepository.save(new TeacherSubject(teacherInDb.getId(), teacher.getSubjectId()));
 		return teacherInDb;
 	}
 	

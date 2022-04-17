@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -52,6 +53,9 @@ public class Teacher {
 	
 	@Column(name = "mobile_number")
 	private Long mobileNumber;
+	
+	@Transient
+	private Long subjectId;
 	
 	public String getName() {
 		return (this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") 
