@@ -146,6 +146,7 @@ public class AttendanceService {
 			long counter = semAttendances.stream().filter(s -> CommonUtil.getResponseFromString(s.getJson()).contains(studentId)).count();
 			counter = counter/4;
 			float percentage = (float) (counter * 100) / actualDays;
+			percentage = percentage > 100 ? 100 : percentage;
 			list.add(new Percentage(semester.getSemesterName(), String.format("%.2f", percentage), new ArrayList<>()));
 		}
 		Collections.sort(list, Comparator.comparing(Percentage::getType));
@@ -159,6 +160,7 @@ public class AttendanceService {
 			
 			long counter = subAttendances.stream().filter(s -> CommonUtil.getResponseFromString(s.getJson()).contains(studentId)).count();
 			float percentage = (float) (counter * 100) / totalSubClasses;
+			percentage = percentage > 100 ? 100 : percentage;
 			for (Percentage p : list) {
 				if (p.getType().equals(subject.getSemester().getSemesterName())) {
 					p.getPercentages().add(new Percentage(subject.getSubjectName(), String.format("%.2f", percentage)));
@@ -177,6 +179,7 @@ public class AttendanceService {
 			
 			Long weekDays = getWeekDays(start.getYear(), start.getMonthValue());
 			float percentage = (float) (days * 100) / weekDays;
+			percentage = percentage > 100 ? 100 : percentage;
 			monthPercentages.add(new Percentage(start.getMonth().toString(), String.format("%.2f", percentage)));
 			start = end;
 		}
