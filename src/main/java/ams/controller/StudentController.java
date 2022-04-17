@@ -43,7 +43,7 @@ public class StudentController {
 	
 	@GetMapping("")
 	public List<Student> list() {
-		List<Student> students = studentRepository.findAll();
+		List<Student> students = studentRepository.findAllStudents();
 		students.stream().forEach(s -> {
 		});
 		return students;
