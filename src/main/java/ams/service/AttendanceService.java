@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,7 +172,8 @@ public class AttendanceService {
 			LocalDate startDate = start;
 			LocalDate end = startDate.plusMonths(1);
 			List<Attendance> monthAtt = attendances.stream().filter(a -> startDate.isBefore(a.getDate()) && a.getDate().isBefore(end)).collect(Collectors.toList());
-			long days = monthAtt.size()/4;
+			long counter = monthAtt.stream().filter(s -> CommonUtil.getResponseFromString(s.getJson()).contains(studentId)).count();
+			long days = counter/4;
 			
 			Long weekDays = getWeekDays(start.getYear(), start.getMonthValue());
 			float percentage = (float) (days * 100) / weekDays;
