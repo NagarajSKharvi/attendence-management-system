@@ -16,4 +16,5 @@ RUN cd /usr/local/ams
 
 #THE CMD COMMAND tells docker the command to run when the container is started up from the image. In this case we are
 # making a REST Call.
-CMD ["java", "-jar", "/usr/local/ams/target/ams-0.1.jar", "--DOCKER_HOSTNAME=container-postgresdb"]
+#CMD ["java", "-jar", "/usr/local/ams/target/ams-0.1.jar", "--DOCKER_HOSTNAME=container-postgresdb"]
+CMD ["java", "-jar", "/usr/local/ams/target/ams-0.1.jar"]

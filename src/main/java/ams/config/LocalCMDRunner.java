@@ -35,7 +35,7 @@ import ams.repository.TeacherSubjectRepository;
 import ams.repository.UserRepository;
 
 @Component
-@Profile({"local"})
+@Profile({"local", "qa"})
 public class LocalCMDRunner implements CommandLineRunner {
 	
 	@Autowired
