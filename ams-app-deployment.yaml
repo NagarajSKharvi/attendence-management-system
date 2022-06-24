@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: ams-app
+  name: ams-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ams-app
+  template:
+    metadata:
+      labels:
+        io.kompose.service: ams-app
+    spec:
+      containers:
+        - env:
+            - name: DOCKER_HOSTNAME
+              value: postgresdb
+          image: kharvinagaraj1/ams:0.1
+          name: ams-app
+          ports:
+            - containerPort: 9999
+          resources: {}
+      restartPolicy: Always

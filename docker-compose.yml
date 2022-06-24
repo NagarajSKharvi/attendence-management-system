@@ -1,6 +1,6 @@
 version: '3.1'
 services:
-  app:
+  ams-app:
     container_name: ams-app
     restart: always
     image: kharvinagaraj1/ams:0.1
@@ -13,7 +13,7 @@ services:
       - db
     environment:
       DOCKER_HOSTNAME: postgresdb
-  db:
+  postgres-db:
     image: postgres:latest
     container_name: postgresdb
     restart: always
